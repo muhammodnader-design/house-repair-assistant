@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- viewport = makes site work on phones (responsive design) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>House Repair Assistant</title>
+  <!-- CSS = appearance. HTML = structure. Keep them separate. -->
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Condensed:ital,wght@0,400..700;1,400..700&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>🏠 House Repair Assistant</h1>
+    <p>Simple help for common home problems — for beginners.</p>
+  </header>
+
+  <main>
+    <!-- 1. Introduction -->
+    <section id="intro">
+      <h2>What problem do you have at home?</h2>
+      <p>
+        Pick a category (like Plumbing or Walls), then pick a problem.
+        We will show you a simple explanation, what you need,
+        and when to call a professional.
+      </p>
+      <p><strong>Safety first:</strong> if you smell gas, see sparks, burning smell, or major water leak — stop and call a professional.</p>
+
+      <!-- Progress guide: tells the user where they are -->
+      <p id="status">👉 Step 1: Pick a category below.</p>
+      <button id="resetBtn" class="choice-btn">🔄 Start over</button>
+    </section>
+
+    <!-- Main path: category -> problem -> solution. Only ONE step visible at a time. -->
+    <section id="sectionStep1">
+      <h2>Step 1 — Choose a category</h2>
+      <div id="categories"></div>
+      <h3>⭐ My saved repairs</h3>
+      <div id="favorites"><p>No saved repairs yet.</p></div>
+    </section>
+
+    <section id="sectionStep2" class="hidden">
+      <h2>Step 2 — Choose a problem</h2>
+      <p id="problemsNote"></p>
+      <div id="problems"></div>
+    </section>
+
+    <section id="sectionStep3" class="hidden">
+      <h2>Step 3 — Read the recommended solution</h2>
+      <div id="result"></div>
+    </section>
+
+    <!-- Shortcut path: search jumps straight to Step 2 -->
+    <section>
+      <h2>Or: search directly</h2>
+      <p>Type a word from the problem name.</p>
+      <input id="search" type="text" placeholder="e.g. 'leak', 'door', 'filter'" />
+      <select id="difficultyFilter">
+        <option value="all">All difficulties</option>
+        <option value="Easy">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Pro-only">Pro-only</option>
+      </select>
+    </section>
+  </main>
+
+  <footer>
+    <p>This is a college project guide, not professional advice. When in doubt, call a qualified professional and check local regulations.</p>
+  </footer>
+
+  <!-- Data loads first, logic second. Both are plain scripts (no modules), so they work from file:// -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

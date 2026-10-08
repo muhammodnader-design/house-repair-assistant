@@ -1,0 +1,122 @@
+/* styles.css — only appearance, no logic here */
+
+/* Basic page setup */
+body {
+  font-family: Roboto, Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  background: #f4f6f8;
+  color: #222;
+}
+
+/* Stage 3+: progress guide + selected category */
+#status {
+  background: #e8f0fe;
+  border: 1px solid #c5dafc;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-weight: bold;
+}
+
+/* Wizard: hide steps that are not active */
+.hidden {
+  display: none;
+}
+
+.choice-btn.selected {
+  background: #1a73e8;
+  color: white;
+}
+
+header {
+  background: #e8881a;
+  color: white;
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+section {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+}
+
+footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #555;
+  padding: 1rem;
+}
+
+/* Placeholder boxes — we will style real buttons later */
+#categories, #problems, #result {
+  padding: 0.5rem;
+  background: #fafafa;
+  border: 1px dashed #bbb;
+  border-radius: 6px;
+}
+
+h1, h2 {
+  font-family: "Libre Caslon Condensed", Georgia, serif;
+}
+
+/* Buttons for categories and problems */
+.choice-btn {
+  display: inline-block;
+  margin: 0.25rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid #1a73e8;
+  border-radius: 6px;
+  background: white;
+  color: #1a73e8;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.choice-btn:hover {
+  background: #1a73e8;
+  color: white;
+}
+
+/* Stage 3: search box, dropdown, warning box */
+#search {
+  padding: 0.5rem;
+  width: 60%;
+  max-width: 300px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+#difficultyFilter {
+  padding: 0.5rem;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-left: 0.5rem;
+}
+
+.warning-box {
+  background: #fff3cd;
+  border: 1px solid #e0a800;
+  border-radius: 6px;
+  padding: 0.75rem;
+}
+
+/* Responsive design: on phones, reduce padding */
+@media (max-width: 500px) {
+  main {
+    padding: 0.5rem;
+  }
+  header {
+    padding: 1rem 0.5rem;
+  }
+}
