@@ -1,9 +1,9 @@
 @echo off
 REM start.bat - one double-click starts the whole project.
-REM For now the site is static, so we just open it in the browser.
-REM When the backend is added (Stage 5), this script will also start the server, e.g.:
-REM   start "backend" cmd /k "node server.js"
-REM   timeout /t 2 >nul
-REM   start "" "http://localhost:3000"
+REM 1) starts the Node server in a new window
+REM 2) waits 2 seconds so the server is ready
+REM 3) opens the app in your browser
 
-start "" "%~dp0index.html"
+start "House Repair Server" cmd /k "cd /d %~dp0 && node server.js"
+timeout /t 2 >nul
+start "" "http://localhost:3000"

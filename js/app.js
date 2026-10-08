@@ -44,6 +44,14 @@ function showCategories() {
     });
     categoriesDiv.appendChild(btn);
   }
+
+  // Also keep the "add category" dropdown in sync
+  const addCategorySelect = document.getElementById("addCategory");
+  if (addCategorySelect) {
+    addCategorySelect.innerHTML = categories
+      .map(c => `<option value="${c.id}">${c.name}</option>`)
+      .join("");
+  }
 }
 
 // --- Draw a list of problems as buttons ---
@@ -117,10 +125,11 @@ function showResult(problemId) {
   });
 }
 
-// --- Favorites (Stage 5-lite): stored in the browser with localStorage ---
+// --- Favorites: localStorage when anonymous, the server database when logged in ---
 const favoritesDiv = document.getElementById("favorites");
+let serverFavorites = null; // null = not logged in (use localStorage)
 
-function getFavorites() {
+function getLocalFavorites() {
   try {
     return JSON.parse(localStorage.getItem("favorites") || "[]");
   } catch {
@@ -128,17 +137,36 @@ function getFavorites() {
   }
 }
 
-function saveFavorites(list) {
-  localStorage.setItem("favorites", JSON.stringify(list));
+function getFavorites() {
+  return serverFavorites !== null ? serverFavorites : getLocalFavorites();
 }
 
 function toggleFavorite(problemId) {
-  const favs = getFavorites();
+  const token = localStorage.getItem("token");
+  if (token) {
+    // Logged in: save on the server, then update the local view
+    fetch("/api/favorites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, problemId })
+    })
+      .then(r => r.json())
+      .then(data => {
+        serverFavorites = data.favorites;
+        const btn = document.getElementById("favBtn");
+        if (btn) btn.textContent = serverFavorites.includes(problemId) ? "⭐ Saved — click to remove" : "☆ Save this guide";
+        renderFavorites();
+      })
+      .catch(() => alert("Could not reach the server."));
+    return serverFavorites !== null && serverFavorites.includes(problemId);
+  }
+
+  // Anonymous: save in the browser only
+  const favs = getLocalFavorites();
   const i = favs.indexOf(problemId);
-  if (i >= 0) favs.splice(i, 1);   // already saved -> remove
-  else favs.push(problemId);        // not saved -> add
-  saveFavorites(favs);
-  return favs.includes(problemId);  // true = now saved
+  if (i >= 0) favs.splice(i, 1); else favs.push(problemId);
+  localStorage.setItem("favorites", JSON.stringify(favs));
+  return favs.includes(problemId);
 }
 
 // Draw the saved repairs list on Step 1. localStorage survives page reload.
@@ -238,5 +266,106 @@ resetBtn.addEventListener("click", () => {
   }
 });
 
+// --- Account UI ---
+const authName = document.getElementById("authName");
+const authPass = document.getElementById("authPass");
+const authStatus = document.getElementById("authStatus");
+
+function setLoggedIn(username) {
+  authStatus.textContent = "Logged in as " + username + ". Your favorites are saved on the server.";
+  document.getElementById("logoutBtn").classList.remove("hidden");
+  const token = localStorage.getItem("token");
+  fetch("/api/favorites?token=" + token)
+    .then(r => r.json())
+    .then(data => { serverFavorites = data.favorites; renderFavorites(); })
+    .catch(() => {});
+}
+
+document.getElementById("signupBtn").addEventListener("click", () => {
+  fetch("/api/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: authName.value, password: authPass.value })
+  })
+    .then(r => r.json())
+    .then(data => { authStatus.textContent = data.message || data.error; })
+    .catch(() => { authStatus.textContent = "Needs the server (start.bat)."; });
+});
+
+document.getElementById("loginBtn").addEventListener("click", () => {
+  fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: authName.value, password: authPass.value })
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", authName.value);
+        setLoggedIn(authName.value);
+      } else {
+        authStatus.textContent = data.error;
+      }
+    })
+    .catch(() => { authStatus.textContent = "Needs the server (start.bat)."; });
+});
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("username");
+  serverFavorites = null;
+  authStatus.textContent = "Logged out. Favorites now save to this browser only.";
+  document.getElementById("logoutBtn").classList.add("hidden");
+  renderFavorites();
+});
+
+// If already logged in from a previous session, restore it
+if (localStorage.getItem("token")) {
+  setLoggedIn(localStorage.getItem("username"));
+}
+
+// --- Add-problem form ---
+document.getElementById("addForm").addEventListener("submit", (event) => {
+  event.preventDefault(); // stop the browser from reloading the page
+  const steps = document.getElementById("addSteps").value.split("\n").filter(s => s.trim() !== "");
+  fetch("/api/repairs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      category: document.getElementById("addCategory").value,
+      problem: document.getElementById("addProblem").value,
+      difficulty: document.getElementById("addDifficulty").value,
+      solutionSteps: steps
+    })
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) {
+        document.getElementById("addStatus").textContent = data.error;
+        return;
+      }
+      document.getElementById("addStatus").textContent = "Added: " + data.problem + ". It is saved in the database.";
+      // Reload data so the new problem appears everywhere
+      fetch("/api/repairs").then(r => r.json()).then(fresh => {
+        categories = fresh.categories;
+        repairs = fresh.repairs;
+        renderRoute();
+      });
+    })
+    .catch(() => { document.getElementById("addStatus").textContent = "Needs the server (start.bat)."; });
+});
+
 // Start on Step 1
 renderRoute();
+
+// Then try to load fresh data from the server.
+// If that fails (file:// double-click), the built-in data from js/data.js stays.
+fetch("/api/repairs")
+  .then(r => r.json())
+  .then(fresh => {
+    categories = fresh.categories;
+    repairs = fresh.repairs;
+    renderRoute(); // re-render with the server/database version
+  })
+  .catch(() => console.log("No server? Using the data built into js/data.js"));

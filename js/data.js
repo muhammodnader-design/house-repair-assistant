@@ -4,7 +4,7 @@
 // Arrays = lists. Objects = one repair problem with named fields.
 // Same shape for every problem = easy to add more later.
 
-const categories = [
+var categories = [
   { id: "plumbing",  name: "🚿 Plumbing and Water" },
   { id: "electricity", name: "⚡ Electricity" },
   { id: "walls",     name: "🧱 Walls" },
@@ -18,7 +18,7 @@ const categories = [
   { id: "general",   name: "🔧 General Maintenance" }
 ];
 
-const repairs = [
+var repairs = [
   {
     id: "plumbing-faucet-drip",
     category: "plumbing",
@@ -453,3 +453,11 @@ const repairs = [
   }
 ];
 
+
+// Allow the Node server (server.js) to reuse this same data file:
+// In the browser this line does nothing. In Node it exports the data.
+try {
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { categories, repairs };
+  }
+} catch (e) { /* not in Node */ }

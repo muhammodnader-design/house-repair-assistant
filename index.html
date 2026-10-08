@@ -39,6 +39,28 @@
       <div id="categories"></div>
       <h3>⭐ My saved repairs</h3>
       <div id="favorites"><p>No saved repairs yet.</p></div>
+
+      <h3>👤 Account (optional — saves your favorites to the server)</h3>
+      <input id="authName" type="text" placeholder="username" />
+      <input id="authPass" type="password" placeholder="password" />
+      <button id="signupBtn" class="choice-btn">Sign up</button>
+      <button id="loginBtn" class="choice-btn">Log in</button>
+      <button id="logoutBtn" class="choice-btn hidden">Log out</button>
+      <p id="authStatus"></p>
+
+      <h3>➕ Add your own repair guide</h3>
+      <form id="addForm">
+        <select id="addCategory"></select>
+        <input id="addProblem" type="text" placeholder="Problem title" required />
+        <select id="addDifficulty">
+          <option>Easy</option>
+          <option>Medium</option>
+          <option>Pro-only</option>
+        </select>
+        <textarea id="addSteps" placeholder="Solution steps, one per line" rows="3"></textarea>
+        <button type="submit" class="choice-btn">Add problem</button>
+      </form>
+      <p id="addStatus"></p>
     </section>
 
     <section id="sectionStep2" class="hidden">
